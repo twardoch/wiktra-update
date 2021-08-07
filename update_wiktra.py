@@ -27,29 +27,31 @@ class WiktionaryModuleDownload(object):
         self.downloaded = []
 
     def get_module_code(self, page="Goth-translit"):
-        res = self.wk("parse", page=f"Module:{page}", prop="wikitext")
+        try:
+            res = self.wk("parse", page=f"Module:{page}", prop="wikitext")
+        except pywikiapi.utils.ApiError:
+            return ''
         return res.parse.wikitext
 
-    def get_modules_category(self, cat="Transliteration_modules"):
-        res = []
+    def write_modules_category(self, cat="Transliteration_modules"):
+        logging.info(f"Category: '{cat}'")
         for r in self.wk.query(list="categorymembers", cmtitle=f"Category:{cat}"):
             for page in r.categorymembers:
                 page = page.title.split(":")
                 if page[0] == "Module":
                     if len(page) > 1:
                         if page[1] != "User":
-                            res.append(page[1])
-        return res
+                            self.write_module(page[1])
 
     def write_module(self, page="Goth-translit", parent=None):
         text = self.get_module_code(page)
         inpath = Path(page)
         outfolder = Path(self.outf, inpath.parent)
         outpath = Path(outfolder, f"{inpath.name}.lua".replace(" ", "-"))
-        info = f"Getting: {page}"
+        info = f"Page: '{page}'"
         if parent:
-            info += f" from {parent}"
-        logging.info(f"Getting: {page}")
+            info = f"Page: '{parent}' > " + info
+        logging.info(info)
         if len(text):
             self.downloaded.append(page)
             for mod in self.re_require.findall(text):
@@ -67,14 +69,13 @@ class WiktionaryModuleDownload(object):
             with open(outpath, "w", encoding="utf-8") as f:
                 f.write(text)
 
-    def write_modules_category(self, cat="Transliteration_modules"):
-        for page in self.get_modules_category(cat):
-            self.write_module(page)
 
-
-def main(output):
+def main(output, page):
     wkd = WiktionaryModuleDownload(output)
-    wkd.write_modules_category("Transliteration_modules")
+    if page:
+        wkd.write_module(page)
+    else:
+        wkd.write_modules_category("Transliteration_modules")
 
 
 def cli():
@@ -92,9 +93,18 @@ def cli():
         dest="output",
         help="""Folder in which the code will be created""",
     )
+    parser.add_argument(
+        "-p",
+        "--page",
+        default=None,
+        required=False,
+        metavar="page",
+        dest="page",
+        help="""Get specific page""",
+    )
 
     args = parser.parse_args()
-    main(output=args.output)
+    main(output=args.output, page=args.page)
 
 
 if __name__ == "__main__":
