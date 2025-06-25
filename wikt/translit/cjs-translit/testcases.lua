@@ -1,6 +1,6 @@
-return require "Module:transliteration module testcases" {
-	module = "cjs-translit",
-	examples = [[
+return require "transliteration module testcases" {
+    module = "cjs-translit",
+    examples = [[
 	эм	em
 	
 	эмчи    emči
@@ -13,5 +13,6 @@ return require "Module:transliteration module testcases" {
 	кебе	kebe
 	ат	    at
 	]],
-	sc = "Cyrl", lang = "cjs",
+    sc = "Cyrl",
+    lang = "cjs"
 }

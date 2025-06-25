@@ -6,15 +6,11 @@
 -- It is a meta-module, meant to be called from other Lua modules, and should     --
 -- not be called directly from #invoke.                                           --
 ------------------------------------------------------------------------------------
---]]
-
---[[
+--]] --[[
 	Inserting new values into a table using a local "index" variable, which is
 	incremented each time, is faster than using "table.insert(t, x)" or
 	"t[#t + 1] = x". See the talk page.
-]]
-
-local libraryUtil = require('libraryUtil')
+]] local libraryUtil = require("libraryUtil")
 
 local export = {}
 
@@ -25,19 +21,17 @@ local checkType = libraryUtil.checkType
 local checkTypeMulti = libraryUtil.checkTypeMulti
 
 local function _check(funcName, expectType)
-	if type(expectType) == "string" then
-		return function(argIndex, arg, nilOk)
-			checkType(funcName, argIndex, arg, expectType, nilOk)
-		end
-	else
-		return function(argIndex, arg, expectType, nilOk)
-			if type(expectType) == "table" then
-				checkTypeMulti(funcName, argIndex, arg, expectType, nilOk)
-			else
-				checkType(funcName, argIndex, arg, expectType, nilOk)
-			end
-		end
-	end
+    if type(expectType) == "string" then
+        return function(argIndex, arg, nilOk) checkType(funcName, argIndex, arg, expectType, nilOk) end
+    else
+        return function(argIndex, arg, expectType, nilOk)
+            if type(expectType) == "table" then
+                checkTypeMulti(funcName, argIndex, arg, expectType, nilOk)
+            else
+                checkType(funcName, argIndex, arg, expectType, nilOk)
+            end
+        end
+    end
 end
 
 --[[
@@ -50,9 +44,7 @@ end
 -- hash part of a table.
 ------------------------------------------------------------------------------------
 --]]
-function export.isPositiveInteger(v)
-	return type(v) == 'number' and v >= 1 and floor(v) == v and v < infinity
-end
+function export.isPositiveInteger(v) return type(v) == "number" and v >= 1 and floor(v) == v and v < infinity end
 
 --[[
 ------------------------------------------------------------------------------------
@@ -65,11 +57,11 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.isNan(v)
-	if type(v) == 'number' and tostring(v) == '-nan' then
-		return true
-	else
-		return false
-	end
+    if type(v) == "number" and tostring(v) == "-nan" then
+        return true
+    else
+        return false
+    end
 end
 
 --[[
@@ -82,28 +74,24 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.shallowClone(t)
-	local ret = {}
-	for k, v in pairs(t) do
-		ret[k] = v
-	end
-	return ret
+    local ret = {}
+    for k, v in pairs(t) do ret[k] = v end
+    return ret
 end
 
 --[[
 Shallow copy
 ]]
 function export.shallowcopy(orig)
-	local orig_type = type(orig)
-	local copy
-	if orig_type == 'table' then
-		copy = {}
-		for orig_key, orig_value in pairs(orig) do
-			copy[orig_key] = orig_value
-		end
-	else -- number, string, boolean, etc
-		copy = orig
-	end
-	return copy
+    local orig_type = type(orig)
+    local copy
+    if orig_type == "table" then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do copy[orig_key] = orig_value end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
 end
 
 --[[
@@ -111,38 +99,34 @@ end
 	Equivalent to mw.clone?
 ]]
 local function deepcopy(orig, includeMetatable, already_seen)
-	-- Stores copies of tables indexed by the original table.
-	already_seen = already_seen or {}
-	
-	local copy = already_seen[orig]
-	if copy ~= nil then
-		return copy
-	end
-	
-	if type(orig) == 'table' then
-		copy = {}
-		for orig_key, orig_value in pairs(orig) do
-			copy[deepcopy(orig_key, includeMetatable, already_seen)] = deepcopy(orig_value, includeMetatable, already_seen)
-		end
-		already_seen[orig] = copy
-		
-		if includeMetatable then
-			local mt = getmetatable(orig)
-			if mt ~= nil then
-				local mt_copy = deepcopy(mt, includeMetatable, already_seen)
-				setmetatable(copy, mt_copy)
-			end
-		end
-	else -- number, string, boolean, etc
-		copy = orig
-	end
-	return copy
+    -- Stores copies of tables indexed by the original table.
+    already_seen = already_seen or {}
+
+    local copy = already_seen[orig]
+    if copy ~= nil then return copy end
+
+    if type(orig) == "table" then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do copy[deepcopy(orig_key, includeMetatable, already_seen)] = deepcopy(orig_value, includeMetatable, already_seen) end
+        already_seen[orig] = copy
+
+        if includeMetatable then
+            local mt = getmetatable(orig)
+            if mt ~= nil then
+                local mt_copy = deepcopy(mt, includeMetatable, already_seen)
+                setmetatable(copy, mt_copy)
+            end
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
 end
 
 function export.deepcopy(orig, noMetatable, already_seen)
-	checkType("deepcopy", 3, already_seen, "table", true)
-	
-	return deepcopy(orig, not noMetatable, already_seen)
+    checkType("deepcopy", 3, already_seen, "table", true)
+
+    return deepcopy(orig, not noMetatable, already_seen)
 end
 
 --[[
@@ -154,16 +138,12 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.append(t1, t2)
-	checkType('append', 1, t1, 'table')
-	checkType('append', 2, t2, 'table')
-	local ret = {}
-	for _, v in ipairs(t1) do
-		table.insert(ret, v)
-	end
-	for _, v in ipairs(t2) do
-		table.insert(ret, v)
-	end
-	return ret
+    checkType("append", 1, t1, "table")
+    checkType("append", 2, t2, "table")
+    local ret = {}
+    for _, v in ipairs(t1) do table.insert(ret, v) end
+    for _, v in ipairs(t2) do table.insert(ret, v) end
+    return ret
 end
 
 --[[
@@ -176,24 +156,24 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.removeDuplicates(t)
-	checkType('removeDuplicates', 1, t, 'table')
-	local isNan = export.isNan
-	local ret, exists = {}, {}
-	local index = 1
-	for _, v in ipairs(t) do
-		if isNan(v) then
-			-- NaNs can't be table keys, and they are also unique, so we don't need to check existence.
-			ret[index] = v
-			index = index + 1
-		else
-			if not exists[v] then
-				ret[index] = v
-				index = index + 1
-				exists[v] = true
-			end
-		end
-	end
-	return ret
+    checkType("removeDuplicates", 1, t, "table")
+    local isNan = export.isNan
+    local ret, exists = {}, {}
+    local index = 1
+    for _, v in ipairs(t) do
+        if isNan(v) then
+            -- NaNs can't be table keys, and they are also unique, so we don't need to check existence.
+            ret[index] = v
+            index = index + 1
+        else
+            if not exists[v] then
+                ret[index] = v
+                index = index + 1
+                exists[v] = true
+            end
+        end
+    end
+    return ret
 end
 
 --[[
@@ -205,30 +185,28 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.numKeys(t, checked)
-	if not checked then
-		checkType('numKeys', 1, t, 'table')
-	end
-	local isPositiveInteger = export.isPositiveInteger
-	local nums = {}
-	local index = 1
-	for k, _ in pairs(t) do
-		if isPositiveInteger(k) then
-			nums[index] = k
-			index = index + 1
-		end
-	end
-	table.sort(nums)
-	return nums
+    if not checked then checkType("numKeys", 1, t, "table") end
+    local isPositiveInteger = export.isPositiveInteger
+    local nums = {}
+    local index = 1
+    for k, _ in pairs(t) do
+        if isPositiveInteger(k) then
+            nums[index] = k
+            index = index + 1
+        end
+    end
+    table.sort(nums)
+    return nums
 end
 
 function export.maxIndex(t)
-	checkType('maxIndex', 1, t, 'table')
-	local positiveIntegerKeys = export.numKeys(t)
-	if positiveIntegerKeys[1] then
-		return math.max(unpack(positiveIntegerKeys))
-	else
-		return 0 -- ???
-	end
+    checkType("maxIndex", 1, t, "table")
+    local positiveIntegerKeys = export.numKeys(t)
+    if positiveIntegerKeys[1] then
+        return math.max(unpack(positiveIntegerKeys))
+    else
+        return 0 -- ???
+    end
 end
 
 --[[
@@ -243,36 +221,36 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.affixNums(t, prefix, suffix)
-	local check = _check('affixNums')
-	check(1, t, 'table')
-	check(2, prefix, 'string', true)
-	check(3, suffix, 'string', true)
-	
-	local function cleanPattern(s)
-		-- Cleans a pattern so that the magic characters ()%.[]*+-?^$ are interpreted literally.
-		s = s:gsub('([%(%)%%%.%[%]%*%+%-%?%^%$])', '%%%1')
-		return s
-	end
-	
-	prefix = prefix or ''
-	suffix = suffix or ''
-	prefix = cleanPattern(prefix)
-	suffix = cleanPattern(suffix)
-	local pattern = '^' .. prefix .. '([1-9]%d*)' .. suffix .. '$'
-	
-	local nums = {}
-	local index = 1
-	for k, _ in pairs(t) do
-		if type(k) == 'string' then
-			local num = mw.ustring.match(k, pattern)
-			if num then
-				nums[index] = tonumber(num)
-				index = index + 1
-			end
-		end
-	end
-	table.sort(nums)
-	return nums
+    local check = _check("affixNums")
+    check(1, t, "table")
+    check(2, prefix, "string", true)
+    check(3, suffix, "string", true)
+
+    local function cleanPattern(s)
+        -- Cleans a pattern so that the magic characters ()%.[]*+-?^$ are interpreted literally.
+        s = s:gsub("([%(%)%%%.%[%]%*%+%-%?%^%$])", "%%%1")
+        return s
+    end
+
+    prefix = prefix or ""
+    suffix = suffix or ""
+    prefix = cleanPattern(prefix)
+    suffix = cleanPattern(suffix)
+    local pattern = "^" .. prefix .. "([1-9]%d*)" .. suffix .. "$"
+
+    local nums = {}
+    local index = 1
+    for k, _ in pairs(t) do
+        if type(k) == "string" then
+            local num = mw.ustring.match(k, pattern)
+            if num then
+                nums[index] = tonumber(num)
+                index = index + 1
+            end
+        end
+    end
+    table.sort(nums)
+    return nums
 end
 
 --[[
@@ -288,34 +266,34 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.numData(t, compress)
-	local check = _check('numData')
-	check(1, t, 'table')
-	check(2, compress, 'boolean', true)
-	
-	local ret = {}
-	for k, v in pairs(t) do
-		local prefix, num = tostring(k):match('^([^0-9]*)([1-9][0-9]*)$')
-		if num then
-			num = tonumber(num)
-			local subtable = ret[num] or {}
-			if prefix == '' then
-				-- Positional parameters match the blank string; put them at the start of the subtable instead.
-				prefix = 1
-			end
-			subtable[prefix] = v
-			ret[num] = subtable
-		else
-			local subtable = ret.other or {}
-			subtable[k] = v
-			ret.other = subtable
-		end
-	end
-	if compress then
-		local other = ret.other
-		ret = export.compressSparseArray(ret)
-		ret.other = other
-	end
-	return ret
+    local check = _check("numData")
+    check(1, t, "table")
+    check(2, compress, "boolean", true)
+
+    local ret = {}
+    for k, v in pairs(t) do
+        local prefix, num = tostring(k):match("^([^0-9]*)([1-9][0-9]*)$")
+        if num then
+            num = tonumber(num)
+            local subtable = ret[num] or {}
+            if prefix == "" then
+                -- Positional parameters match the blank string; put them at the start of the subtable instead.
+                prefix = 1
+            end
+            subtable[prefix] = v
+            ret[num] = subtable
+        else
+            local subtable = ret.other or {}
+            subtable[k] = v
+            ret.other = subtable
+        end
+    end
+    if compress then
+        local other = ret.other
+        ret = export.compressSparseArray(ret)
+        ret.other = other
+    end
+    return ret
 end
 
 --[[
@@ -328,15 +306,15 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.compressSparseArray(t)
-	checkType('compressSparseArray', 1, t, 'table')
-	local ret = {}
-	local index = 1
-	local nums = export.numKeys(t)
-	for _, num in ipairs(nums) do
-		ret[index] = t[num]
-		index = index + 1
-	end
-	return ret
+    checkType("compressSparseArray", 1, t, "table")
+    local ret = {}
+    local index = 1
+    local nums = export.numKeys(t)
+    for _, num in ipairs(nums) do
+        ret[index] = t[num]
+        index = index + 1
+    end
+    return ret
 end
 
 --[[
@@ -348,18 +326,18 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.sparseIpairs(t)
-	checkType('sparseIpairs', 1, t, 'table')
-	local nums = export.numKeys(t)
-	local i = 0
-	return function()
-		i = i + 1
-		local key = nums[i]
-		if key then
-			return key, t[key]
-		else
-			return nil, nil
-		end
-	end
+    checkType("sparseIpairs", 1, t, "table")
+    local nums = export.numKeys(t)
+    local i = 0
+    return function()
+        i = i + 1
+        local key = nums[i]
+        if key then
+            return key, t[key]
+        else
+            return nil, nil
+        end
+    end
 end
 
 --[[
@@ -371,12 +349,10 @@ end
 ------------------------------------------------------------------------------------
 --]]
 function export.size(t)
-	checkType('size', 1, t, 'table')
-	local i = 0
-	for _ in pairs(t) do
-		i = i + 1
-	end
-	return i
+    checkType("size", 1, t, "table")
+    local i = 0
+    for _ in pairs(t) do i = i + 1 end
+    return i
 end
 
 --[[
@@ -386,11 +362,9 @@ end
 -- Intended to be used on data loaded with mw.loadData. For other tables, use #.
 --]]
 function export.length(t)
-	local i = 0
-	repeat
-		i = i + 1
-	until t[i] == nil
-	return i - 1
+    local i = 0
+    repeat i = i + 1 until t[i] == nil
+    return i - 1
 end
 
 --[[
@@ -404,25 +378,21 @@ NOTE: This is *NOT* smart enough to properly handle cycles; in such a case, it
 will get into an infinite loop.
 ]]
 function export.deepEquals(x, y)
-	if type(x) == "table" and type(y) == "table" then
-		-- Two tables are the same if they have the same number of elements
-		-- and all keys that are present in one of the tables compare equal
-		-- to the corresponding keys in the other table, using structural
-		-- comparison.
-		local sizex = 0
-		for key, value in pairs(x) do
-			if not export.deepEquals(value, y[key]) then
-				return false
-			end
-			sizex = sizex + 1
-		end
-		local sizey = export.size(y)
-		if sizex ~= sizey then
-			return false
-		end 
-		return true
-	end
-	return x == y
+    if type(x) == "table" and type(y) == "table" then
+        -- Two tables are the same if they have the same number of elements
+        -- and all keys that are present in one of the tables compare equal
+        -- to the corresponding keys in the other table, using structural
+        -- comparison.
+        local sizex = 0
+        for key, value in pairs(x) do
+            if not export.deepEquals(value, y[key]) then return false end
+            sizex = sizex + 1
+        end
+        local sizey = export.size(y)
+        if sizex ~= sizey then return false end
+        return true
+    end
+    return x == y
 end
 
 --[[
@@ -438,18 +408,12 @@ NOTE: This is *NOT* smart enough to properly handle cycles; in such a case, it
 will get into an infinite loop.
 ]]
 function export.deepEqualsList(x, y)
-	if type(x) == "table" and type(y) == "table" then
-		if #x ~= #y then
-			return false
-		end 
-		for key, value in ipairs(x) do
-			if not export.deepEqualsList(value, y[key]) then
-				return false
-			end
-		end
-		return true
-	end
-	return x == y
+    if type(x) == "table" and type(y) == "table" then
+        if #x ~= #y then return false end
+        for key, value in ipairs(x) do if not export.deepEqualsList(value, y[key]) then return false end end
+        return true
+    end
+    return x == y
 end
 
 --[[
@@ -458,17 +422,13 @@ portion of the list. Shallow comparison is used unless `deepCompare` is given
 (in which case comparison is done using `deepEqualsList`).
 ]]
 function export.contains(list, x, deepCompare)
-	checkType('contains', 1, list, 'table')
-	if deepCompare then
-		for _, v in ipairs(list) do
-			if export.deepEqualsList(v, x) then return true end
-		end
-	else
-		for _, v in ipairs(list) do
-			if v == x then return true end
-		end
-	end
-	return false
+    checkType("contains", 1, list, "table")
+    if deepCompare then
+        for _, v in ipairs(list) do if export.deepEqualsList(v, x) then return true end end
+    else
+        for _, v in ipairs(list) do if v == x then return true end end
+    end
+    return false
 end
 
 --[[
@@ -478,17 +438,13 @@ unless `deepCompare` is given (in which case comparison is done using
 `deepEquals`).
 ]]
 function export.tableContains(tbl, x, deepCompare)
-	checkType('tableContains', 1, tbl, 'table')
-	if deepCompare then
-		for _, v in pairs(tbl) do
-			if export.deepEquals(v, x) then return true end
-		end
-	else
-		for _, v in pairs(tbl) do
-			if v == x then return true end
-		end
-	end
-	return false
+    checkType("tableContains", 1, tbl, "table")
+    if deepCompare then
+        for _, v in pairs(tbl) do if export.deepEquals(v, x) then return true end end
+    else
+        for _, v in pairs(tbl) do if v == x then return true end end
+    end
+    return false
 end
 
 --[[
@@ -505,13 +461,13 @@ which uses `table.insert(list, item)` to insert at the end but
 ]]
 -- append to list if element not already present
 function export.insertIfNot(list, item, pos, deepCompare)
-	if not export.contains(list, item, deepCompare) then
-		if pos then
-			table.insert(list, pos, item)
-		else
-			table.insert(list, item)
-		end
-	end
+    if not export.contains(list, item, deepCompare) then
+        if pos then
+            table.insert(list, pos, item)
+        else
+            table.insert(list, item)
+        end
+    end
 end
 
 --[[
@@ -528,17 +484,13 @@ end
 	and the output is unpredictable.
 ]]
 function export.keyFor(t, valueToFind)
-	local check = _check('keyFor')
-	check(1, t, 'table')
-	check(2, valueToFind, { 'string', 'number' })
-	
-	for key, value in pairs(t) do
-		if value == valueToFind then
-			return key
-		end
-	end
-	
-	return nil
+    local check = _check("keyFor")
+    check(1, t, "table")
+    check(2, valueToFind, {"string", "number"})
+
+    for key, value in pairs(t) do if value == valueToFind then return key end end
+
+    return nil
 end
 
 --[[
@@ -546,13 +498,13 @@ end
 	is defined.
 ]]
 local function defaultKeySort(key1, key2)
-	-- "number" < "string", so numbers will be sorted before strings.
-	local type1, type2 = type(key1), type(key2)
-	if type1 ~= type2 then
-		return type1 < type2
-	else
-		return key1 < key2
-	end
+    -- "number" < "string", so numbers will be sorted before strings.
+    local type1, type2 = type(key1), type(key2)
+    if type1 ~= type2 then
+        return type1 < type2
+    else
+        return key1 < key2
+    end
 end
 
 --[[
@@ -561,27 +513,25 @@ end
 	If there are only numerical keys, numKeys is probably more efficient.
 ]]
 function export.keysToList(t, keySort, checked)
-	if not checked then
-		local check = _check('keysToList')
-		check(1, t, 'table')
-		check(2, keySort, 'function', true)
-	end
-	
-	local list = {}
-	local index = 1
-	for key, _ in pairs(t) do
-		list[index] = key
-		index = index + 1
-	end
-	
-	-- Place numbers before strings, otherwise sort using <.
-	if not keySort then
-		keySort = defaultKeySort
-	end
-	
-	table.sort(list, keySort)
-	
-	return list
+    if not checked then
+        local check = _check("keysToList")
+        check(1, t, "table")
+        check(2, keySort, "function", true)
+    end
+
+    local list = {}
+    local index = 1
+    for key, _ in pairs(t) do
+        list[index] = key
+        index = index + 1
+    end
+
+    -- Place numbers before strings, otherwise sort using <.
+    if not keySort then keySort = defaultKeySort end
+
+    table.sort(list, keySort)
+
+    return list
 end
 
 --[[
@@ -589,36 +539,36 @@ end
 	If there are only numerical keys, sparseIpairs is probably more efficient.
 ]]
 function export.sortedPairs(t, keySort)
-	local check = _check('keysToList')
-	check(1, t, 'table')
-	check(2, keySort, 'function', true)
-	
-	local list = export.keysToList(t, keySort, true)
-	
-	local i = 0
-	return function()
-		i = i + 1
-		local key = list[i]
-		if key ~= nil then
-			return key, t[key]
-		else
-			return nil, nil
-		end
-	end
+    local check = _check("keysToList")
+    check(1, t, "table")
+    check(2, keySort, "function", true)
+
+    local list = export.keysToList(t, keySort, true)
+
+    local i = 0
+    return function()
+        i = i + 1
+        local key = list[i]
+        if key ~= nil then
+            return key, t[key]
+        else
+            return nil, nil
+        end
+    end
 end
 
 function export.reverseIpairs(list)
-	checkType('reverse_ipairs', 1, list, 'table')
-	
-	local i = #list + 1
-	return function()
-		i = i - 1
-		if list[i] ~= nil then
-			return i, list[i]
-		else
-			return nil, nil
-		end
-	end
+    checkType("reverse_ipairs", 1, list, "table")
+
+    local i = #list + 1
+    return function()
+        i = i - 1
+        if list[i] ~= nil then
+            return i, list[i]
+        else
+            return nil, nil
+        end
+    end
 end
 
 --[=[
@@ -636,36 +586,31 @@ end
 			which HTML cannot be used.
 ]=]
 function export.serialCommaJoin(seq, options)
-	local check = _check("serialCommaJoin", "table")
-	check(1, seq)
-	check(2, options, true)
-	
-	local length = #seq
-	
-	if not options then
-		options = {}
-	end
-	
-	local conj
-	if length > 1 then
-		conj = options.conj or "and"
-		if options.italicizeConj then
-			conj = "''" .. conj .. "''"
-		end
-	end
-	
-	if length == 0 then
-		return ""
-	elseif length == 1 then
-		return seq[1] -- nothing to join
-	elseif length == 2 then
-		return seq[1] .. " " .. conj .. " " .. seq[2]
-	else
-		local comma = options.dontTag and "," or '<span class="serial-comma">,</span>'
-		conj = options.dontTag and ' ' .. conj .. " " or '<span class="serial-and"> ' .. conj .. '</span> '
-		return table.concat(seq, ", ", 1, length - 1) ..
-				comma .. conj .. seq[length]
-	end
+    local check = _check("serialCommaJoin", "table")
+    check(1, seq)
+    check(2, options, true)
+
+    local length = #seq
+
+    if not options then options = {} end
+
+    local conj
+    if length > 1 then
+        conj = options.conj or "and"
+        if options.italicizeConj then conj = "''" .. conj .. "''" end
+    end
+
+    if length == 0 then
+        return ""
+    elseif length == 1 then
+        return seq[1] -- nothing to join
+    elseif length == 2 then
+        return seq[1] .. " " .. conj .. " " .. seq[2]
+    else
+        local comma = options.dontTag and "," or "<span class=\"serial-comma\">,</span>"
+        conj = options.dontTag and " " .. conj .. " " or "<span class=\"serial-and\"> " .. conj .. "</span> "
+        return table.concat(seq, ", ", 1, length - 1) .. comma .. conj .. seq[length]
+    end
 end
 
 --[[
@@ -674,15 +619,15 @@ end
 	sparseConcat{ nil, b, c, d }  =>  "bcd"
 ]]
 function export.sparseConcat(t, sep, i, j)
-	local list = {}
-	
-	local list_i = 0
-	for _, v in export.sparseIpairs(t) do
-		list_i = list_i + 1
-		list[list_i] = v
-	end
-	
-	return table.concat(list, sep, i, j)
+    local list = {}
+
+    local list_i = 0
+    for _, v in export.sparseIpairs(t) do
+        list_i = list_i + 1
+        list[list_i] = v
+    end
+
+    return table.concat(list, sep, i, j)
 end
 
 --[[
@@ -690,60 +635,52 @@ end
 	{ "a", "b", "c" } -> { "c", "b", "a" }
 --]]
 function export.reverse(t)
-	checkType("reverse", 1, t, "table")
-	
-	local new_t = {}
-	local new_t_i = 1
-	for i = #t, 1, -1 do
-		new_t[new_t_i] = t[i]
-		new_t_i = new_t_i + 1
-	end
-	return new_t
+    checkType("reverse", 1, t, "table")
+
+    local new_t = {}
+    local new_t_i = 1
+    for i = #t, 1, -1 do
+        new_t[new_t_i] = t[i]
+        new_t_i = new_t_i + 1
+    end
+    return new_t
 end
 
-function export.reverseConcat(t, sep, i, j)
-	return table.concat(export.reverse(t), sep, i, j)
-end
+function export.reverseConcat(t, sep, i, j) return table.concat(export.reverse(t), sep, i, j) end
 
 -- { "a", "b", "c" } -> { a = 1, b = 2, c = 3 }
 function export.invert(array)
-	checkType("invert", 1, array, "table")
-	
-	local map = {}
-	for i, v in ipairs(array) do
-		map[v] = i
-	end
-	
-	return map
+    checkType("invert", 1, array, "table")
+
+    local map = {}
+    for i, v in ipairs(array) do map[v] = i end
+
+    return map
 end
 
 --[[
 	{ "a", "b", "c" } -> { ["a"] = true, ["b"] = true, ["c"] = true }
 --]]
 function export.listToSet(t)
-	checkType("listToSet", 1, t, "table")
-	
-	local set = {}
-	for _, item in ipairs(t) do
-		set[item] = true
-	end
-	return set
+    checkType("listToSet", 1, t, "table")
+
+    local set = {}
+    for _, item in ipairs(t) do set[item] = true end
+    return set
 end
 
 --[[
 	Returns true if all keys in the table are consecutive integers starting at 1.
 --]]
 function export.isArray(t)
-	checkType("isArray", 1, t, "table")
-	
-	local i = 0
-	for _ in pairs(t) do
-		i = i + 1
-		if t[i] == nil then
-			return false
-		end
-	end
-	return true
+    checkType("isArray", 1, t, "table")
+
+    local i = 0
+    for _ in pairs(t) do
+        i = i + 1
+        if t[i] == nil then return false end
+    end
+    return true
 end
 
 return export

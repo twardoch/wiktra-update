@@ -71,67 +71,14 @@ tt["Tfng"] = {
     ["thz"] = {["ⵀ"] = "b", ["ⵓ"] = "w", ["ⵘ"] = "ɣ"}
 }
 
-tt["Latn"] = {
-    ["common"] = {
-        ["a"] = "ⴰ",
-        ["ā"] = "ⴰ",
-        ["b"] = "ⴱ",
-        ["g"] = "ⴳ",
-        ["d"] = "ⴷ",
-        ["ḏ"] = "ⴷ",
-        ["ḍ"] = "ⴹ",
-        ["e"] = "ⴻ",
-        ["f"] = "ⴼ",
-        ["ǧ"] = "ⴵ",
-        ["k"] = "ⴽ",
-        ["h"] = "ⵀ",
-        ["ḥ"] = "ⵃ",
-        ["ɛ"] = "ⵄ",
-        ["x"] = "ⵅ",
-        ["q"] = "ⵇ",
-        ["i"] = "ⵉ",
-        ["j"] = "ⵊ",
-        ["l"] = "ⵍ",
-        ["m"] = "ⵎ",
-        ["n"] = "ⵏ",
-        ["p"] = "ⵒ",
-        ["u"] = "ⵓ",
-        ["r"] = "ⵔ",
-        ["ṛ"] = "ⵕ",
-        ["ɣ"] = "ⵖ",
-        ["s"] = "ⵙ",
-        ["ṣ"] = "ⵚ",
-        ["š"] = "ⵛ",
-        ["t"] = "ⵜ",
-        ["ṯ"] = "ⵜ",
-        ["č"] = "ⵞ",
-        ["ṭ"] = "ⵟ",
-        ["v"] = "ⵠ",
-        ["w"] = "ⵡ",
-        ["y"] = "ⵢ",
-        ["z"] = "ⵣ",
-        ["ẓ"] = "ⵥ",
-        ["o"] = "ⵧ",
-        ["ʷ"] = "ⵯ",
-        ["."] = "⵰",
-    },
-    ["tmh"] = {["b"] = "ⵀ", ["w"] = "ⵓ"},
-    ["thv"] = {["b"] = "ⵀ", ["w"] = "ⵓ"},
-    ["taq"] = {["b"] = "ⵀ", ["w"] = "ⵓ"},
-    ["ttq"] = {["b"] = "ⵀ", ["w"] = "ⵓ"},
-    ["thz"] = {["b"] = "ⵀ", ["w"] = "wⵓ", ["ɣ"] = "ⵘ"}
-}
+tt["Latn"] = {["common"] = {["a"] = "ⴰ", ["ā"] = "ⴰ", ["b"] = "ⴱ", ["g"] = "ⴳ", ["d"] = "ⴷ", ["ḏ"] = "ⴷ", ["ḍ"] = "ⴹ", ["e"] = "ⴻ", ["f"] = "ⴼ", ["ǧ"] = "ⴵ", ["k"] = "ⴽ", ["h"] = "ⵀ", ["ḥ"] = "ⵃ", ["ɛ"] = "ⵄ", ["x"] = "ⵅ", ["q"] = "ⵇ", ["i"] = "ⵉ", ["j"] = "ⵊ", ["l"] = "ⵍ", ["m"] = "ⵎ", ["n"] = "ⵏ", ["p"] = "ⵒ", ["u"] = "ⵓ", ["r"] = "ⵔ", ["ṛ"] = "ⵕ", ["ɣ"] = "ⵖ", ["s"] = "ⵙ", ["ṣ"] = "ⵚ", ["š"] = "ⵛ", ["t"] = "ⵜ", ["ṯ"] = "ⵜ", ["č"] = "ⵞ", ["ṭ"] = "ⵟ", ["v"] = "ⵠ", ["w"] = "ⵡ", ["y"] = "ⵢ", ["z"] = "ⵣ", ["ẓ"] = "ⵥ", ["o"] = "ⵧ", ["ʷ"] = "ⵯ", ["."] = "⵰"}, ["tmh"] = {["b"] = "ⵀ", ["w"] = "ⵓ"}, ["thv"] = {["b"] = "ⵀ", ["w"] = "ⵓ"}, ["taq"] = {["b"] = "ⵀ", ["w"] = "ⵓ"}, ["ttq"] = {["b"] = "ⵀ", ["w"] = "ⵓ"}, ["thz"] = {["b"] = "ⵀ", ["w"] = "wⵓ", ["ɣ"] = "ⵘ"}}
 
 function export.tr_alt(text, lang, sc)
-    if not sc then
-        sc = require("scripts").findBestScript(text, require("languages").getByCode(lang or "ber")):getCode()
-    end
+    if not sc then sc = require("scripts").findBestScript(text, require("languages").getByCode(lang or "ber")):getCode() end
 
     if sc == "Latn" then
-        if tt[sc][lang] then
-            text = mw.ustring.gsub(text, '.', tt[sc][lang])
-        end
-        text = mw.ustring.gsub(text, '.', tt[sc]["common"])
+        if tt[sc][lang] then text = mw.ustring.gsub(text, ".", tt[sc][lang]) end
+        text = mw.ustring.gsub(text, ".", tt[sc]["common"])
     elseif sc == "Arab" then
         text = nil
     elseif sc == "Tfng" then
@@ -142,9 +89,7 @@ function export.tr_alt(text, lang, sc)
 end
 
 function export.tr(text, lang, sc)
-    if not sc then
-        sc = require("scripts").findBestScript(text, require("languages").getByCode(lang or "ber")):getCode()
-    end
+    if not sc then sc = require("scripts").findBestScript(text, require("languages").getByCode(lang or "ber")):getCode() end
 
     if sc == "Arab" then
         -- perhaps will be implemented in the future
@@ -153,10 +98,8 @@ function export.tr(text, lang, sc)
         -- no need to transliterate
         text = nil
     elseif sc == "Tfng" then
-        if tt[sc][lang] then
-            text = mw.ustring.gsub(text, '.', tt[sc][lang])
-        end
-        text = mw.ustring.gsub(text, '.', tt[sc]["common"])
+        if tt[sc][lang] then text = mw.ustring.gsub(text, ".", tt[sc][lang]) end
+        text = mw.ustring.gsub(text, ".", tt[sc]["common"])
     end
 
     return text
